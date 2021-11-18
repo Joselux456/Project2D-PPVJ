@@ -168,6 +168,6 @@ MonoBehaviour:
   Speedo: 8
   LeFoot: {fileID: 0}
   jumpSpeed: 10
-  dashPower: 3
+  dashPower: 5
   fireDelay: 12
   LemonAmmo: {fileID: 8256377388360488330, guid: be28b9ad476145049ac734f470efed67, type: 3}

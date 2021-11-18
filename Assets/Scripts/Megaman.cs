@@ -13,7 +13,7 @@ public class Megaman : MonoBehaviour
     Animator myAnimator;
     Rigidbody2D myBody;
     BoxCollider2D myCollider;
-    float FoHspeed, FoJspeed,enabler;
+    float enabler,face;
     int dashTime,dashTimer,fireTimer;
     int jumpCapacity = 1;
     
@@ -23,9 +23,8 @@ public class Megaman : MonoBehaviour
         myAnimator = GetComponent<Animator>();
         myBody = GetComponent<Rigidbody2D>();
         myCollider = GetComponent<BoxCollider2D>();
-        FoHspeed = Speedo;
-        FoJspeed = jumpSpeed;
         dashTime = (int)(10 * dashPower);
+        face = 1;
         dashTimer = dashTime;
     }
 
@@ -41,11 +40,13 @@ public class Megaman : MonoBehaviour
     }
     void Fire()
     {
+        face = Mathf.Sign(transform.localScale.x);
         if (Input.GetKeyDown(KeyCode.Z))
         {
-            
+            GameObject newLemon = LemonAmmo;
             myAnimator.SetLayerWeight(1, 1);
-            Instantiate(LemonAmmo, transform.position + new Vector3(Mathf.Sign(transform.localScale.x)*(myCollider.bounds.extents.x+1f),0, Mathf.Sign(transform.localScale.x) * 0.1f), transform.rotation);
+            newLemon.transform.localScale = new Vector3(face * 2, 2, 2);
+            Instantiate(newLemon, transform.position, transform.rotation);
             fireTimer = fireDelay;
         }
         else if(fireTimer == 0)
@@ -61,6 +62,7 @@ public class Megaman : MonoBehaviour
             {
                 transform.localScale = new Vector2(Mathf.Sign(mov), 1);
                 myAnimator.SetBool("running", true);
+                face = Mathf.Sign(mov); 
 
             }
             else
@@ -75,17 +77,15 @@ public class Megaman : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.X) && dashTimer != 0 && IsGrounded())
         {
             myAnimator.SetBool("FastBoi", true);
-            Speedo = Speedo + 1.5F * dashPower;
-            jumpSpeed = jumpSpeed + dashPower;
+            myBody.AddRelativeForce(new Vector2(Mathf.Sign(transform.localScale.x)*dashPower,0), ForceMode2D.Impulse);
         }
         else if (Input.GetKeyUp(KeyCode.X) || dashTimer == 0)
         {
             myAnimator.SetBool("FastBoi", false);
-            if (IsGrounded())
+            if (IsGrounded() && dashTimer != 0 && myBody.velocity != new Vector2(0,0))
             {
-                Speedo = FoHspeed;
+                myBody.AddRelativeForce(new Vector2(Mathf.Sign(transform.localScale.x) * -1f * ((2 * myBody.velocity.magnitude)/dashPower), 0), ForceMode2D.Impulse);
             }
-            jumpSpeed = FoJspeed;
             dashTimer = dashTime;
         }
         dashTimer--;
